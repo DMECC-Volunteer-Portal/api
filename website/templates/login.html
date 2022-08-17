@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+{% block current_page %}Login{% endblock %}
+{% block content %}
+<br/>
+<br/>
+<div class="justify-content-center" style="display:flex;">
+    <div class="jumbotron col col-md-6">
+        <form method="POST">
+            <br/>
+            <h3 class="DMECCFont" align="center">Login</h3>
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email address"
+                       required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" id="password" name="password"
+                       placeholder="Enter your password" required>
+            </div>
+            <br/>
+            <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
