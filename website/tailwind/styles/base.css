@@ -44,7 +44,7 @@
     }
 
     .clickable {
-        @apply interactive active:scale-[110%] cursor-pointer
+        @apply interactive active:scale-[110%] cursor-pointer select-none
     }
 }
 

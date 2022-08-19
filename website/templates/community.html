@@ -37,34 +37,86 @@
         <div class="w-[90vw] h-[30vw] md:w-[43.5vw] md:h-[58vw] xl:h-[21.75vw] bg-white border-normal group animated sm:hover:scale-[105%]
             grid grid-cols-5 grid-rows-1  h-full w-full p-[5vw] gap-[2vw]">
             <div>
-                <div class="border-normal rounded-full aspect-square h-auto w-full grid">
-                    <p class="text-cmd place-self-center">Test</p>
+                <div class="border-normal rounded-full aspect-square h-auto w-full grid interactive">
+                    <p class="text-cmd place-self-center">{{ hours_display }}</p>
                 </div>
                 <p class="text-center text-cxs pt-[1vw]">Total Company Hours</p>
             </div>
             <div>
-                <div class="border-normal rounded-full aspect-square h-auto w-full grid">
-                    <p class="text-cmd place-self-center">Test</p>
+                <div class="rounded-full aspect-square h-auto w-full grid grid-rows-1 grid-cols-1 interactive">
+                    <div class="rounded-full aspect-square self-center overflow-hidden">
+                        <div class="grid grid-cols-2 grid-rows-1 w-full h-full">
+                            <div class="overflow-hidden">
+                                <div class="grid grid-cols-2 grid-rows-1 w-[200%] h-full rotate-[{{ 180 - (360 - (360 * (hours_year / 1000)))|int }}deg]">
+                                    <div></div>
+                                    {% if hours_year > 1000 %}
+                                        <div class="bg-green-500"></div>
+                                    {% else %}
+                                        <div class="bg-rose-500"></div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="overflow-hidden">
+                                <div class="grid grid-cols-2 grid-rows-1 w-[200%] h-full -rotate-[{{ 180 - (360 * (hours_year / 1000))|int }}deg] -translate-x-[50%] transform-gpu">
+                                    <div></div>
+                                    {% if hours_year > 1000 %}
+                                        <div class="bg-green-500"></div>
+                                    {% else %}
+                                        <div class="bg-rose-500"></div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-rows-1 grid-cols-1 rounded-full border-normal aspect-square h-full w-full -translate-y-[100%] transform-gpu
+                                p-[1.2vw] sm:p-[1vw] md:p-[0.8vw] xl:p-[0.6vw]">
+                            <div class="bg-white grid rounded-full border-normal">
+                                <p class="text-cmd place-self-center">{{ hours_year_display }}</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <p class="text-center text-cxs pt-[1vw]">Company Hours This Year</p>
             </div>
             <div>
-                <div class="border-normal rounded-full aspect-square h-auto w-full grid">
-                    <p class="text-cmd place-self-center">Test</p>
+                <div class="border-normal rounded-full aspect-square h-auto w-full grid interactive">
+                    <p class="text-cmd place-self-center">{{ volunteer_count }}</p>
                 </div>
                 <p class="text-center text-cxs pt-[1vw]">Current Volunteers</p>
             </div>
             <div>
-                <div class="border-normal rounded-full aspect-square h-auto w-full grid">
+                <div class="border-normal rounded-full aspect-square h-auto w-full grid interactive">
                     <p class="text-cmd place-self-center">Test</p>
                 </div>
                 <p class="text-center text-cxs pt-[1vw]">Volunteer Origins</p>
             </div>
             <div>
-                <div class="border-normal rounded-full aspect-square h-auto w-full grid">
+                <div class="border-normal rounded-full aspect-square h-auto w-full grid interactive">
                     <p class="text-cmd place-self-center">Test</p>
                 </div>
                 <p class="text-center text-cxs pt-[1vw]">International Locations</p>
+            </div>
+        </div>
+        <div class="w-[90vw] h-[30vw] md:w-[43.5vw] md:h-[58vw] xl:h-[21.75vw] bg-white border-normal group animated sm:hover:scale-[105%]
+            grid grid-cols-3 grid-rows-1  h-full w-full p-[5vw] gap-[2vw]">
+            <div class="grid grid-cols-1 grid-rows-3">
+                <div class="self-center grid grid-cols-10 clickable">
+                    <div class="col-span-2 grid h-auto w-full aspect-square rounded-full border-thin">
+                        <i class="fa-brands fa-instagram place-self-center"></i>
+                    </div>
+                    <p class="col-span-8">&nbsp;Instagram</p>
+                </div>
+                <div class="self-center grid grid-cols-10 clickable">
+                    <div class="col-span-2 grid h-auto w-full aspect-square rounded-full border-thin">
+                        <i class="fa-brands fa-youtube place-self-center"></i>
+                    </div>
+                    <p class="col-span-8">&nbsp;Youtube</p>
+                </div>
+                <div class="self-center grid grid-cols-10 clickable">
+                    <div class="col-span-2 grid h-auto w-full aspect-square rounded-full border-thin">
+                        <i class="fa-regular fa-envelope place-self-center"></i>
+                    </div>
+                    <p class="col-span-8">&nbsp;Message Us</p>
+                </div>
             </div>
         </div>
     </div>

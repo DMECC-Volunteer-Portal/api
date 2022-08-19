@@ -35,6 +35,14 @@ async def get_top_volunteers(
     return result.scalars().all()
 
 
+async def get_volunteer_count(  # TODO: only active volunteers
+        db: AsyncSession,
+) -> int:
+    result = await db.execute(
+        select(func.count(models.UserPermissions.permission_name)).filter(models.UserPermissions.permission_name == "volunteer"))
+    return result.scalars().first()
+
+
 async def get_user_total_hours(
         db: AsyncSession,
         user_id: int,
@@ -340,6 +348,22 @@ async def create_volunteer_record(
     await db.commit()
     await db.refresh(new_volunteer_record)
     return new_volunteer_record
+
+
+async def get_total_company_hours(
+        db: AsyncSession,
+) -> int:
+    result = await db.execute(func.sum(models.VolunteerRecord.hours))
+    return result.scalars().first()
+
+
+async def get_total_company_hours_past_year(
+        db: AsyncSession,
+) -> int:
+    earliest_date = datetime.datetime.utcnow() - datetime.timedelta(days=365)
+    result = await db.execute(
+        select(func.sum(models.VolunteerRecord.hours)).filter(models.VolunteerRecord.date > earliest_date))
+    return result.scalars().first()
 
 
 async def create_request(
