@@ -10,7 +10,6 @@ from website.core import crud, schemas
 from website.core.database import get_session
 
 data = APIRouter()
-templates = Jinja2Templates(directory="website/templates")
 
 
 @data.get('/api/user/current-user')  # TODO: only for testing only

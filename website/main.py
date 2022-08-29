@@ -1,7 +1,6 @@
 import asyncio
 
 from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
 from starlette.middleware.cors import CORSMiddleware
 
 from website.api.auth import auth
@@ -27,7 +26,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.mount("/static", StaticFiles(directory="website/static"), name="static")  # TODO: Get rid of
 app.include_router(auth, tags=["auth"])
 app.include_router(admin, tags=["admin"])
 app.include_router(school, tags=["school"])

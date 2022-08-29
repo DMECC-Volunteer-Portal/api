@@ -19,7 +19,6 @@ from website.core.config import JWT_SECRET, JWT_ALG, JWT_EXPIRE_SECONDS
 from website.core.database import get_session
 
 auth = APIRouter()
-templates = Jinja2Templates(directory="website/templates")
 
 
 class OAuth2PasswordBearerCustom(OAuth2):
@@ -238,27 +237,3 @@ async def logout_user(
 ):
     response.delete_cookie("access_token")
     return {"status": "success", "detail": "Logged out!"}
-
-
-@auth.get('/change-password', response_class=HTMLResponse)
-async def change_password_page(
-        request: Request,
-        current_user: schemas.User = Security(get_current_user_required, scopes=['me'])
-):
-    return templates.TemplateResponse("change-password.html", {'request': request, 'user': current_user})
-
-
-@auth.get('/login', response_class=HTMLResponse)
-async def login_page(
-        request: Request,
-        current_user: schemas.User = Depends(get_current_user_optional)
-):
-    return templates.TemplateResponse("login.html", {'request': request, 'user': current_user})
-
-
-@auth.get('/signup', response_class=HTMLResponse)
-async def signup_page(
-        request: Request,
-        current_user: schemas.User = Depends(get_current_user_optional)
-):
-    return templates.TemplateResponse("signup.html", {'request': request, 'user': current_user})

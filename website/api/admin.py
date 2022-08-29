@@ -1,7 +1,6 @@
 import json
 
 from fastapi import APIRouter, Security, Depends, status, HTTPException
-from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from website.api.auth import get_current_user_required
@@ -9,7 +8,6 @@ from website.core import crud, schemas
 from website.core.database import get_session
 
 admin = APIRouter()
-templates = Jinja2Templates(directory="website/templates")
 
 
 async def check_create_region(
