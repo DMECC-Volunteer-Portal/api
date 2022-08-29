@@ -5,21 +5,39 @@ from fastapi import APIRouter, Security, Depends, status, HTTPException
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from website.api.auth import get_current_user_required
+from website.api.auth import get_current_user_required, get_current_user_optional
 from website.core import crud, schemas
 from website.core.database import get_session
 
 data = APIRouter()
-templates = Jinja2Templates(directory="website/templates")
 
 
 @data.get('/api/user/current-user')  # TODO: only for testing only
 async def get_current_user(
-        current_user: schemas.User = Security(get_current_user_required, scopes=['volunteer']),
+        current_user: schemas.User = Security(get_current_user_required),
         db: AsyncSession = Depends(get_session)
 ):
     user = await crud.get_user(db, id=current_user.id)
-    return schemas.User.from_orm(user)
+    # user = await crud.get_user(db, id=1)
+    filled_entries = 0
+    for attr in schemas.UserUpdateProfile.from_orm(user).__dict__.keys():
+        if not (getattr(user, attr) is None or getattr(user, attr) == "" or getattr(user, attr) == "string"):
+            filled_entries = filled_entries + 1
+    return json.dumps({
+        "id": user.id,
+        "email": user.email,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+        "school": user.school.name,
+        "org_name": user.school.region.name,
+        "org_abbr": user.school.region.abbreviation,
+        "country": user.school.region.country,
+        "start_date": user.start_date,
+        "grade": user.grade_level,
+        "rank": user.rank,
+        "v_level": user.training_level,
+        "filled_entries": filled_entries
+    }, default=str)
 
 
 async def check_update_profile(
@@ -185,7 +203,7 @@ async def get_event_roles(
     return json.dumps(roles)
 
 
-@data.get('/api/data/get-teams-of-user')
+@data.get('/api/user/get-teams-of-user')
 async def get_user_teams(
         current_user: schemas.User = Security(get_current_user_required, scopes=['volunteer']),
         db: AsyncSession = Depends(get_session)
@@ -199,22 +217,7 @@ async def get_user_teams(
     return json.dumps(teams)
 
 
-@data.get('/api/data/get-roles-of-team')  # TODO: only show roles user has
-async def get_team_roles(
-        team_id: int,
-        current_user: schemas.User = Security(get_current_user_required, scopes=['volunteer']),
-        db: AsyncSession = Depends(get_session)
-):
-    roles = {}
-    roles['0'] = "Select a position"
-    for role in await crud.get_roles_by_team(db, team_id):
-        roles[role.id] = role.name
-    if len(roles) == 1:
-        roles['0'] = "No available positions"
-    return json.dumps(roles)
-
-
-@data.get('/api/data/get-recent-records-of-user')
+@data.get('/api/user/get-recent-records-of-user')
 async def get_recent_records_of_user(
         current_user: schemas.User = Security(get_current_user_required, scopes=['volunteer']),
         db: AsyncSession = Depends(get_session)
@@ -231,7 +234,19 @@ async def get_recent_records_of_user(
     return json.dumps(records)
 
 
-@data.get('/api/data/get-top-volunteers')
+@data.get('/api/user/total-hours')
+async def get_total_hours(
+        current_user: schemas.User = Security(get_current_user_required),
+        db: AsyncSession = Depends(get_session)
+):
+    user = await crud.get_user(db, current_user.id)
+    total_hours = 0
+    for record in user.volunteer_records:
+        total_hours = total_hours + record.hours
+    return total_hours
+
+
+@data.get('/api/data/get-top-volunteers')  # TODO: create snapshot and rank all volunteers
 async def get_top_volunteer(
         db: AsyncSession = Depends(get_session)
 ):
@@ -265,3 +280,18 @@ async def get_top_volunteer(
             {"name": f"{volunteer.first_name} {volunteer.last_name}", "school": school, "org": org, "loc": loc, "lvl": lvl, "yrs": yrs,
              "hrs": total_hours, "rnk": rnk})
     return json.dumps(volunteers)
+
+
+@data.get('/api/data/get-roles-of-team')  # TODO: only show roles user has
+async def get_team_roles(
+        team_id: int,
+        current_user: schemas.User = Security(get_current_user_required, scopes=['volunteer']),
+        db: AsyncSession = Depends(get_session)
+):
+    roles = {}
+    roles['0'] = "Select a position"
+    for role in await crud.get_roles_by_team(db, team_id):
+        roles[role.id] = role.name
+    if len(roles) == 1:
+        roles['0'] = "No available positions"
+    return json.dumps(roles)

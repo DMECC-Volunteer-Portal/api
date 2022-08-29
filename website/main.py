@@ -1,7 +1,7 @@
 import asyncio
 
 from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
+from starlette.middleware.cors import CORSMiddleware
 
 from website.api.auth import auth
 from website.api.data import data
@@ -14,7 +14,18 @@ from website.core.database import init_database
 
 app = FastAPI()
 
-app.mount("/static", StaticFiles(directory="website/static"), name="static")
+origins = [
+    "http://localhost:3000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.include_router(auth, tags=["auth"])
 app.include_router(admin, tags=["admin"])
 app.include_router(school, tags=["school"])
