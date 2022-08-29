@@ -8,7 +8,7 @@ from typing import Optional, Dict
 from fastapi import APIRouter, Depends, HTTPException, status, Security, Request, Response, Form
 from fastapi.openapi.models import OAuthFlows as OAuthFlowsModel
 from fastapi.responses import HTMLResponse
-from fastapi.security import SecurityScopes, OAuth2
+from fastapi.security import SecurityScopes, OAuth2, OAuth2PasswordRequestForm
 from fastapi.security.utils import get_authorization_scheme_param
 from fastapi.templating import Jinja2Templates
 from passlib.hash import bcrypt
@@ -36,13 +36,14 @@ class OAuth2PasswordBearerCustom(OAuth2):
         super().__init__(flows=flows, scheme_name=scheme_name, auto_error=auto_error)
 
     async def __call__(self, request: Request) -> Optional[str]:
-        authorization: str = request.cookies.get("access_token")  # cookie version
+        # authorization: str = request.cookies.get("access_token")  # cookie version
+        authorization: str = request.headers.get("Authorization")  # header version
         scheme, param = get_authorization_scheme_param(authorization)
         return param
 
 
 oauth2_scheme = OAuth2PasswordBearerCustom(
-    tokenUrl='auth/login-user',
+    tokenUrl='/api/auth/login-user',
     scopes={'me': 'Read information about the current user.', 'admin': 'Access database, modify records, etc.'}
 )
 
@@ -165,11 +166,14 @@ async def check_login_user(
 @auth.post('/api/auth/login-user')
 async def login_user(
         response: Response,
-        email: str = Form(),
-        password: str = Form(),
+        # email: str = Form(),
+        # password: str = Form(), for cookies
+        form_data: OAuth2PasswordRequestForm = Depends(),
         db: AsyncSession = Depends(get_session)
 ):
-    result = await check_login_user(db, email, password)
+    email = form_data.username
+    password = form_data.password
+    await check_login_user(db, email, password)
     user = await crud.get_user(db, email=email)
     scopes = []
     for scope in user.permissions:
@@ -184,8 +188,8 @@ async def login_user(
         scopes=scopes
     )
     access_token = jwt.encode(token_info.dict(), JWT_SECRET)
-    response.set_cookie(key="access_token", value=f"Bearer {access_token}", httponly=True, samesite="Strict")
-    return result
+    # response.set_cookie(key="access_token", value=f"Bearer {access_token}", httponly=True, samesite="Strict")
+    return {'access_token': access_token, 'token_type': 'bearer'}
 
 
 async def check_signup_user(

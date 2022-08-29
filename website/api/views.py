@@ -17,10 +17,8 @@ templates = Jinja2Templates(directory="website/templates")
 async def portal(
         request: Request,
         db: AsyncSession = Depends(get_session),
-        # current_user: schemas.User = Security(get_current_user_required),
+        current_user: schemas.User = Security(get_current_user_required),
 ):
-    # TODO: only for deployment, NEED TO FIX
-    current_user = await crud.get_user(db, 1)
     filled_entries = 0
     for attr in schemas.UserUpdateProfile.from_orm(current_user).__dict__.keys():
         if not (getattr(current_user, attr) is None or getattr(current_user, attr) == "" or getattr(current_user, attr) == "string"):
