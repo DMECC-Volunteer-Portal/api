@@ -3,6 +3,7 @@ import asyncio
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
+from website.api.user import user
 from website.api.auth import auth
 from website.api.data import data
 from website.api.admin import admin
@@ -32,4 +33,5 @@ app.include_router(school, tags=["school"])
 app.include_router(program, tags=["program"])
 app.include_router(data, tags=["data"])
 app.include_router(training, tags=["training"])
+app.include_router(user, tags=["user"])
 app.include_router(views, tags=["views"])
